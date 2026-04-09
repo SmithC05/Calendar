@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { motion } from "framer-motion";
 
@@ -36,7 +36,6 @@ export function DayCell({
 
   return (
     <motion.button
-      layout
       type="button"
       aria-label={`${format(date, "MMMM d, yyyy")}${markerLabel}`}
       aria-pressed={isSelected}
@@ -52,8 +51,7 @@ export function DayCell({
       ].join(" ")}
     >
       {shouldRenderRangeFill ? (
-        <motion.span
-          layout
+        <span
           aria-hidden="true"
           className={[
             "pointer-events-none absolute top-1/2 h-9 -translate-y-1/2 rounded-full bg-range/95 sm:h-10",
@@ -64,8 +62,7 @@ export function DayCell({
         />
       ) : null}
 
-      <motion.span
-        layout
+      <span
         className={[
           "relative z-10 inline-flex h-9 w-9 items-center justify-center rounded-full text-sm font-medium transition sm:h-10 sm:w-10 sm:text-base",
           isSingleDay || isEndpoint
@@ -76,7 +73,7 @@ export function DayCell({
         ].join(" ")}
       >
         {date.getDate()}
-      </motion.span>
+      </span>
 
       {marker && isCurrentMonth ? (
         <span

@@ -1,6 +1,6 @@
-"use client";
+﻿"use client";
 
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 
 import {
   getDayNames,
@@ -44,31 +44,28 @@ export function CalendarGrid({
         ))}
       </div>
 
-      <AnimatePresence initial={false} mode="wait">
-        <motion.div
-          key={gridKey}
-          initial={{ opacity: 0, y: 6 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -6 }}
-          transition={{ duration: 0.26, ease: [0.22, 1, 0.36, 1] }}
-          className="grid grid-cols-7 gap-1.5 sm:gap-2.5 lg:gap-3"
-        >
-          {days.map((day) => (
-            <DayCell
-              key={toISODate(day.date)}
-              date={day.date}
-              isCurrentMonth={day.isCurrentMonth}
-              isEnd={isRangeEnd(day.date, endDate)}
-              isInRange={isWithinRange(day.date, startDate, endDate)}
-              isStart={isRangeStart(day.date, startDate)}
-              isToday={day.isToday}
-              marker={day.marker}
-              showRangeFill={showRangeFill}
-              onClick={() => onDateClick(day.date)}
-            />
-          ))}
-        </motion.div>
-      </AnimatePresence>
+      <motion.div
+        key={gridKey}
+        initial={{ opacity: 0, y: 6 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+        className="grid grid-cols-7 gap-1.5 sm:gap-2.5 lg:gap-3"
+      >
+        {days.map((day) => (
+          <DayCell
+            key={toISODate(day.date)}
+            date={day.date}
+            isCurrentMonth={day.isCurrentMonth}
+            isEnd={isRangeEnd(day.date, endDate)}
+            isInRange={isWithinRange(day.date, startDate, endDate)}
+            isStart={isRangeStart(day.date, startDate)}
+            isToday={day.isToday}
+            marker={day.marker}
+            showRangeFill={showRangeFill}
+            onClick={() => onDateClick(day.date)}
+          />
+        ))}
+      </motion.div>
     </div>
   );
 }
