@@ -8,8 +8,7 @@ WallStory Calendar is a polished, frontend-only wall calendar built with Next.js
 
 - Repository: https://github.com/SmithC05/Calendar
 - Live Demo: https://calendar-three-woad.vercel.app/
-- Video Demo: add your Loom or YouTube walkthrough link here after recording
-
+- Video Demo: https://drive.google.com/drive/folders/1p67Tew0tjnM1dIeUEb4hpxEjLYODH-RX?usp=drive_link
 ## What is implemented
 
 - Physical wall calendar styling with a large monthly hero panel, decorative hanger rings, paper textures, and perforation details.
