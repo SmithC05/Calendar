@@ -7,7 +7,7 @@ WallStory Calendar is a polished, frontend-only wall calendar built with Next.js
 ## Links
 
 - Repository: https://github.com/SmithC05/Calendar
-- Live Demo: pending Vercel deployment from this workspace
+- Live Demo: https://calendar-three-woad.vercel.app/
 - Video Demo: add your Loom or YouTube walkthrough link here after recording
 
 ## What is implemented
@@ -55,14 +55,6 @@ If you want live Unsplash photography instead of the built-in themed artwork, ad
 NEXT_PUBLIC_UNSPLASH_ACCESS_KEY=your_key_here
 ```
 
-## Suggested demo walkthrough
-
-1. Show the desktop layout and explain the wall-calendar visual direction.
-2. Select a single day, then extend it into a multi-day range.
-3. Save a range-linked note and switch to the month memo.
-4. Change months and show the animated hero transition.
-5. Toggle between light and dark themes.
-6. Collapse to a mobile viewport and repeat a quick range + note interaction.
 
 ## Validation
 
