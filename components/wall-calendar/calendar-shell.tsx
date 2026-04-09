@@ -165,6 +165,36 @@ export function CalendarShell() {
     setEndDate(today);
   }
 
+  function handleOpenNote(noteKey: string) {
+    const monthMatch = /^month-(\d{4})-(\d{2})$/.exec(noteKey);
+
+    if (monthMatch) {
+      const [, year, month] = monthMatch;
+      const targetMonth = new Date(Number(year), Number(month) - 1, 1);
+
+      setCurrentMonth(startOfMonth(targetMonth));
+      clearSelection();
+      return;
+    }
+
+    const [startValue, endValue] = noteKey.split("_");
+
+    if (!isStoredDateValue(startValue)) {
+      return;
+    }
+
+    const nextStart = fromISODate(startValue);
+    const nextEnd = endValue && isStoredDateValue(endValue) ? fromISODate(endValue) : nextStart;
+
+    if (!nextStart) {
+      return;
+    }
+
+    setCurrentMonth(startOfMonth(nextStart));
+    setStartDate(nextStart);
+    setEndDate(nextEnd ?? nextStart);
+  }
+
   return (
     <div className="space-y-4 sm:space-y-5 lg:space-y-6">
       <motion.div
@@ -229,6 +259,7 @@ export function CalendarShell() {
             currentMonth={currentMonth}
             monthNoteKey={monthNoteKey}
             notes={notes}
+            onOpenNote={handleOpenNote}
             onSave={handleSaveNote}
             selectedRangeKey={selectedRangeKey}
           />
@@ -236,4 +267,8 @@ export function CalendarShell() {
       </div>
     </div>
   );
+}
+
+function isStoredDateValue(value: string): value is ISODate {
+  return /^\d{4}-\d{2}-\d{2}$/.test(value);
 }

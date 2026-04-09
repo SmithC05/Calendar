@@ -11,6 +11,7 @@ type NotesPanelProps = {
   monthNoteKey: string;
   selectedRangeKey: string | null;
   notes: Record<string, string>;
+  onOpenNote: (key: string) => void;
   onSave: (key: string, value: string) => void;
 };
 
@@ -19,6 +20,7 @@ export function NotesPanel({
   monthNoteKey,
   selectedRangeKey,
   notes,
+  onOpenNote,
   onSave
 }: NotesPanelProps) {
   const noteFieldId = useId();
@@ -56,6 +58,7 @@ export function NotesPanel({
   const panelLabel = activeMode === "selection" ? selectionLabel : monthLabel;
   const isDirty = Boolean(activeKey) && draft !== currentValue;
   const savedNoteCount = Object.keys(notes).length;
+  const savedNotes = useMemo(() => buildSavedNotes(notes), [notes]);
 
   function handleSave() {
     if (!activeKey) {
@@ -147,6 +150,61 @@ export function NotesPanel({
               ? `${savedNoteCount} saved note${savedNoteCount === 1 ? "" : "s"}`
               : "No saved notes yet"}
           </span>
+        </div>
+
+        <div className="mt-5">
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-[0.68rem] uppercase tracking-[0.28em] text-ink/45">Saved Notes</p>
+            {savedNoteCount ? (
+              <span className="text-xs text-ink/48">Tap any entry to reopen it.</span>
+            ) : null}
+          </div>
+
+          {savedNotes.length ? (
+            <div className="mt-3 grid gap-2">
+              {savedNotes.map((note) => {
+                const isActive = note.key === activeKey;
+
+                return (
+                  <button
+                    key={note.key}
+                    type="button"
+                    onClick={() => {
+                      setActiveMode(note.kind === "month" ? "month" : "selection");
+                      onOpenNote(note.key);
+                    }}
+                    className={[
+                      "rounded-[1.2rem] border px-4 py-3 text-left transition duration-200",
+                      isActive
+                        ? "border-rust/25 bg-rust/8 shadow-[0_10px_24px_rgb(var(--shadow)_/_0.08)]"
+                        : "border-ink/10 bg-paper/70 hover:bg-paper"
+                    ].join(" ")}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="text-sm font-medium text-ink">{note.title}</p>
+                        <p className="mt-1 text-xs uppercase tracking-[0.18em] text-ink/45">
+                          {note.badge}
+                        </p>
+                      </div>
+                      {isActive ? (
+                        <span className="inline-flex h-7 items-center rounded-full bg-rust px-2.5 text-[0.65rem] font-medium uppercase tracking-[0.18em] text-white">
+                          Open
+                        </span>
+                      ) : null}
+                    </div>
+                    <p className="mt-2 overflow-hidden text-sm leading-6 text-ink/65 [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2]">
+                      {note.preview}
+                    </p>
+                  </button>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="mt-3 rounded-[1.2rem] border border-dashed border-ink/12 bg-paper/62 px-4 py-3 text-sm leading-6 text-ink/58">
+              Saved notes will appear here so you can revisit older month memos and date ranges.
+            </div>
+          )}
         </div>
 
         <label
@@ -274,4 +332,71 @@ function formatSelectionLabel(selectedRangeKey: string | null) {
     title: formatRangeLabel(startDate, endDate),
     description: "A shared note for the full selected date range."
   };
+}
+
+type SavedNoteEntry = {
+  key: string;
+  kind: "month" | "selection";
+  title: string;
+  badge: string;
+  preview: string;
+  sortValue: number;
+};
+
+function buildSavedNotes(notes: Record<string, string>): SavedNoteEntry[] {
+  return Object.entries(notes)
+    .map(([key, value]) => createSavedNoteEntry(key, value))
+    .filter((entry): entry is SavedNoteEntry => entry !== null)
+    .sort((first, second) => second.sortValue - first.sortValue);
+}
+
+function createSavedNoteEntry(key: string, value: string): SavedNoteEntry | null {
+  const preview = value.trim();
+
+  if (!preview) {
+    return null;
+  }
+
+  const monthMatch = /^month-(\d{4})-(\d{2})$/.exec(key);
+
+  if (monthMatch) {
+    const [, year, month] = monthMatch;
+    const monthDate = new Date(Number(year), Number(month) - 1, 1);
+
+    return {
+      key,
+      kind: "month",
+      title: `${formatMonthYear(monthDate)} memo`,
+      badge: "Month memo",
+      preview,
+      sortValue: monthDate.getTime()
+    };
+  }
+
+  const [startValue, endValue] = key.split("_");
+  const startDate = parseStoredDate(startValue);
+
+  if (!startDate) {
+    return null;
+  }
+
+  const endDate = parseStoredDate(endValue) ?? startDate;
+
+  return {
+    key,
+    kind: "selection",
+    title: formatRangeLabel(startDate, endDate),
+    badge: startValue === endValue || !endValue ? "Date note" : "Range note",
+    preview,
+    sortValue: startDate.getTime()
+  };
+}
+
+function parseStoredDate(value?: string) {
+  if (!value) {
+    return null;
+  }
+
+  const parsedDate = parseISO(value);
+  return isValid(parsedDate) ? parsedDate : null;
 }
